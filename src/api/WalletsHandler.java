@@ -16,6 +16,29 @@ public class WalletsHandler extends BaseHandler {
     }
 
     @Override
+    protected void post(HttpExchange httpExchange) throws IOException {
+        Map<String, String> params = APIUtils.getPOSTparams(httpExchange);
+
+        String name = params.get("name");
+        if (name == null) {
+            APIUtils.sendResponse(httpExchange, 400, format("field 'name' is required"));
+        }
+
+        String owner = params.get("owner");
+        if (owner == null) {
+            APIUtils.sendResponse(httpExchange, 400, format("field 'owner' is required"));
+        }
+
+        try {
+            int id = Wallets.createWallet(conn, name, Integer.parseInt(owner));
+            ResultSet rs = Wallets.getWallet(conn, id);
+            APIUtils.sendResponse(httpExchange, 201, Wallets.serialize(rs));
+        } catch (SQLException e) {
+            APIUtils.sendResponse(httpExchange, 500, format(e.getMessage()));
+        }
+    }
+
+    @Override
     protected void get(HttpExchange httpExchange) throws IOException {
         Map<String, String> params = APIUtils.getGETparams(httpExchange);
 
@@ -37,22 +60,44 @@ public class WalletsHandler extends BaseHandler {
     }
 
     @Override
-    protected void post(HttpExchange httpExchange) throws IOException {
-        Map<String, String> params = APIUtils.getPOSTparams(httpExchange);
+    protected void put(HttpExchange httpExchange) throws IOException {
+        Map<String, String> params = APIUtils.getPUTparams(httpExchange);
 
         String name = params.get("name");
         if (name == null) {
             APIUtils.sendResponse(httpExchange, 400, format("field 'name' is required"));
         }
 
-        String owner = params.get("owner");
-        if (owner == null) {
-            APIUtils.sendResponse(httpExchange, 400, format("field 'owner' is required"));
+        String id = params.get("id");
+        if (id == null) {
+            APIUtils.sendResponse(httpExchange, 400, format("field 'id' is required"));
         }
 
         try {
-            Wallets.createWallet(conn, name, Integer.parseInt(owner));
-            APIUtils.sendResponse(httpExchange, 201, format("wallet created successfully"));
+            Wallets.updateWallet(conn, name, Integer.parseInt(id));
+            ResultSet rs = Wallets.getWallet(conn, Integer.parseInt(id));
+            APIUtils.sendResponse(httpExchange, 200, Wallets.serialize(rs));
+        } catch (SQLException e) {
+            APIUtils.sendResponse(httpExchange, 500, format(e.getMessage()));
+        }
+    }
+
+    @Override
+    protected void delete(HttpExchange httpExchange) throws IOException {
+        Map<String, String> params = APIUtils.getDELETEparams(httpExchange);
+
+        String id = params.get("id");
+        if (id == null) {
+            APIUtils.sendResponse(httpExchange, 400, format("field 'id' is required"));
+        }
+
+        try {
+            int n = Wallets.deleteWallet(conn, Integer.parseInt(id));
+            if (n > 0) {
+                APIUtils.sendResponse(httpExchange, 200, format("deleted wallet"));
+            } else {
+                APIUtils.sendResponse(httpExchange, 404, format("not found"));
+            }
         } catch (SQLException e) {
             APIUtils.sendResponse(httpExchange, 500, format(e.getMessage()));
         }

@@ -11,7 +11,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class Wallets {
-    public static void createWallet(Connection conn, String name, int owner) throws SQLException {
+    public static int createWallet(Connection conn, String name, int owner) throws SQLException {
         String query = "INSERT INTO Wallet (name, owner) VALUES (?, ?)";
 
         PreparedStatement stmt = conn.prepareStatement(query);
@@ -20,6 +20,7 @@ public class Wallets {
         stmt.executeUpdate();
 
         stmt.close();
+        return stmt.getGeneratedKeys().getInt(1);
     }
 
     public static ResultSet getWallet(Connection conn, int id) throws SQLException {
@@ -32,9 +33,27 @@ public class Wallets {
         return rs;
     }
 
-    public static void updateWallet() {}
+    public static void updateWallet(Connection conn, String name, int id) throws SQLException {
+        String query = "UPDATE Wallet SET name = ? WHERE id = ?";
 
-    public static void deleteWallet() {}
+        PreparedStatement stmt = conn.prepareStatement(query);
+        stmt.setString(1, name);
+        stmt.setInt(2, id);
+        stmt.executeUpdate();
+
+        stmt.close();
+    }
+
+    public static int deleteWallet(Connection conn, int id) throws SQLException {
+        String query = "DELETE FROM Wallet WHERE id = ?";
+
+        PreparedStatement stmt = conn.prepareStatement(query);
+        stmt.setInt(1, id);
+        int n = stmt.executeUpdate();
+
+        stmt.close();
+        return n;
+    }
 
     public static String serialize(ResultSet data) throws SQLException {
         Map<String, String> fields = new HashMap<>();

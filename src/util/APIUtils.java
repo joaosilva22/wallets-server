@@ -49,4 +49,12 @@ public class APIUtils {
         if (params == null) params = new HashMap<>();
         return params;
     }
+
+    public static Map<String, String> getPUTparams(HttpExchange httpExchange) throws IOException {
+        return getPOSTparams(httpExchange);
+    }
+
+    public static Map<String, String> getDELETEparams(HttpExchange httpExchange) throws IOException {
+        return getPOSTparams(httpExchange);
+    }
 }
