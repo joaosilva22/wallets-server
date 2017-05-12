@@ -18,9 +18,9 @@ public class AccountsHandler extends BaseHandler {
     protected void post(HttpExchange httpExchange) throws IOException {
         try {
             Accounts.createAccount(conn);
-            APIUtils.sendResponse(httpExchange, 201, "Account created successfully");
+            APIUtils.sendResponse(httpExchange, 201, format("account created successfully"));
         } catch (SQLException e) {
-            APIUtils.sendResponse(httpExchange, 500, "Internal server error");
+            APIUtils.sendResponse(httpExchange, 500, format(e.getMessage()));
         }
     }
 }

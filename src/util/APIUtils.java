@@ -23,6 +23,9 @@ public class APIUtils {
     public static Map<String, String> getGETparams(HttpExchange httpExchange) {
         String query = httpExchange.getRequestURI().getQuery();
         Map<String, String> result = new HashMap<>();
+        if (query == null) {
+            return result;
+        }
         for (String param : query.split("&")) {
             String pair[] = param.split("=");
             if (pair.length > 1) {
@@ -41,6 +44,9 @@ public class APIUtils {
 
         Gson gson = new Gson();
         Type type = new TypeToken<Map<String, String>>(){}.getType();
-        return gson.fromJson(query, type);
+
+        Map<String, String> params = gson.fromJson(query, type);
+        if (params == null) params = new HashMap<>();
+        return params;
     }
 }
