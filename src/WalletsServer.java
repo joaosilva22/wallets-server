@@ -1,4 +1,6 @@
 import api.AccountsHandler;
+import api.CategoriesHandler;
+import api.MovementsHandler;
 import api.WalletsHandler;
 import com.sun.net.httpserver.HttpServer;
 import database.SQLiteConnection;
@@ -30,7 +32,10 @@ public class WalletsServer {
 
         server.createContext("/accounts", new AccountsHandler(conn));
         server.createContext("/wallets", new WalletsHandler(conn));
+        server.createContext("/categories", new CategoriesHandler(conn));
+        server.createContext("/movements", new MovementsHandler(conn));
         server.start();
+
         IOUtils.log("Server listening on port 8000...");
     }
 }

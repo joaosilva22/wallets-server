@@ -27,6 +27,7 @@ public class WalletsHandler extends BaseHandler {
         String owner = params.get("owner");
         if (owner == null) {
             APIUtils.sendResponse(httpExchange, 400, format("field 'owner' is required"));
+            return;
         }
 
         try {
@@ -45,6 +46,7 @@ public class WalletsHandler extends BaseHandler {
         String id = params.get("id");
         if (id == null) {
             APIUtils.sendResponse(httpExchange, 400, format("field 'id' is required"));
+            return;
         }
 
         try {
@@ -66,11 +68,13 @@ public class WalletsHandler extends BaseHandler {
         String name = params.get("name");
         if (name == null) {
             APIUtils.sendResponse(httpExchange, 400, format("field 'name' is required"));
+            return;
         }
 
         String id = params.get("id");
         if (id == null) {
             APIUtils.sendResponse(httpExchange, 400, format("field 'id' is required"));
+            return;
         }
 
         try {
@@ -89,6 +93,7 @@ public class WalletsHandler extends BaseHandler {
         String id = params.get("id");
         if (id == null) {
             APIUtils.sendResponse(httpExchange, 400, format("field 'id' is required"));
+            return;
         }
 
         try {

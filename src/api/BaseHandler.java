@@ -9,12 +9,9 @@ import java.io.IOException;
 import java.sql.Connection;
 
 public class BaseHandler implements HttpHandler {
-    protected Connection conn;
+    Connection conn;
 
-    protected static final String ERR_404_NOT_FOUND = "{ \"error\": \"resource not found\" }";
-    protected static final String ERR_500_INTERNAL_SERVER_ERROR = "{ \"error\": \"internal server error\" }";
-
-    protected BaseHandler(Connection conn) {
+    BaseHandler(Connection conn) {
         this.conn = conn;
     }
 
@@ -60,7 +57,7 @@ public class BaseHandler implements HttpHandler {
         APIUtils.sendResponse(httpExchange, 405, "Method not allowed");
     }
 
-    protected String format(String message) {
-        return "{ \"message\": \"" + message + "\" }";
+    String format(String message) {
+        return "{\"message\":\"" + message + "\"}";
     }
 }

@@ -19,7 +19,7 @@ DROP TABLE IF EXISTS Category;
 CREATE TABLE Category (
   id INTEGER PRIMARY KEY,
   name TEXT,
-  ammount REAL,
+  amount REAL,
   wallet INTEGER,
   FOREIGN KEY(wallet) REFERENCES Wallet(id) ON DELETE CASCADE
 );
@@ -29,7 +29,7 @@ CREATE TABLE Movement (
   id INTEGER PRIMARY KEY,
   name TEXT,
   description TEXT,
-  ammount REAL,
+  amount REAL,
   category INTEGER,
   FOREIGN KEY(category) REFERENCES Category(id) ON DELETE CASCADE
 );

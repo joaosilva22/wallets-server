@@ -28,9 +28,8 @@ public class Wallets {
 
         PreparedStatement stmt = conn.prepareStatement(query);
         stmt.setInt(1, id);
-        ResultSet rs = stmt.executeQuery();
 
-        return rs;
+        return stmt.executeQuery();
     }
 
     public static void updateWallet(Connection conn, String name, int id) throws SQLException {
@@ -61,7 +60,6 @@ public class Wallets {
         fields.put("owner", data.getObject("owner").toString());
 
         Gson gson = new GsonBuilder().create();
-        String json = gson.toJson(fields);
-        return json;
+        return gson.toJson(fields);
     }
 }
