@@ -2,9 +2,10 @@ DROP TABLE IF EXISTS Account;
 CREATE TABLE Account (
   id INTEGER PRIMARY KEY,
   email TEXT,
+  salt TEXT,
+  password TEXT,
   first_name TEXT,
-  last_name TEXT,
-  access_token TEXT
+  last_name TEXT
 );
 
 DROP TABLE IF EXISTS Wallet;

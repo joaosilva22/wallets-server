@@ -4,7 +4,6 @@ import com.sun.net.httpserver.HttpExchange;
 import database.Categories;
 import util.APIUtils;
 
-import javax.xml.transform.Result;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.ResultSet;

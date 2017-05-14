@@ -37,24 +37,24 @@ public class BaseHandler implements HttpHandler {
                 IOUtils.log("DELETE " + path + " " + httpExchange.getResponseCode());
                 break;
             default:
-                APIUtils.sendResponse(httpExchange, 405, "Method not allowed");
+                APIUtils.sendResponse(httpExchange, 405, format("method not allowed"));
         }
     }
 
     protected void post(HttpExchange httpExchange) throws IOException {
-        APIUtils.sendResponse(httpExchange, 405, "Method not allowed");
+        APIUtils.sendResponse(httpExchange, 405, format("method not allowed"));
     }
 
     protected void get(HttpExchange httpExchange) throws IOException {
-        APIUtils.sendResponse(httpExchange, 405, "Method not allowed");
+        APIUtils.sendResponse(httpExchange, 405, format("method not allowed"));
     }
 
     protected void put(HttpExchange httpExchange) throws IOException {
-        APIUtils.sendResponse(httpExchange, 405, "Method not allowed");
+        APIUtils.sendResponse(httpExchange, 405, format("method not allowed"));
     }
 
     protected void delete(HttpExchange httpExchange) throws IOException {
-        APIUtils.sendResponse(httpExchange, 405, "Method not allowed");
+        APIUtils.sendResponse(httpExchange, 405, format("method not allowed"));
     }
 
     String format(String message) {

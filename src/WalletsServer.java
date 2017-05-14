@@ -1,7 +1,5 @@
-import api.AccountsHandler;
-import api.CategoriesHandler;
-import api.MovementsHandler;
-import api.WalletsHandler;
+import api.*;
+import auth.AuthHelper;
 import com.sun.net.httpserver.HttpServer;
 import database.SQLiteConnection;
 import util.IOUtils;
