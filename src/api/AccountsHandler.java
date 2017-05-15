@@ -7,6 +7,7 @@ import database.Accounts;
 import util.APIUtils;
 
 import java.io.IOException;
+import java.security.KeyPair;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
 import java.sql.Connection;
@@ -35,14 +36,14 @@ public class AccountsHandler extends BaseHandler {
             return;
         }
 
-        String first_name = params.get("first_name");
-        if (first_name == null) {
+        String firstName = params.get("first_name");
+        if (firstName == null) {
             APIUtils.sendResponse(httpExchange, 400, format("field 'first_name' is required"));
             return;
         }
 
-        String last_name = params.get("last_name");
-        if (last_name == null) {
+        String lastName = params.get("last_name");
+        if (lastName == null) {
             APIUtils.sendResponse(httpExchange, 400, format("field 'last_name' is required"));
             return;
         }
@@ -51,7 +52,15 @@ public class AccountsHandler extends BaseHandler {
             String salt = AuthHelper.getSalt();
             String hash = AuthHelper.generatePasswordHash(password, salt);
 
-            int id = Accounts.createAccount(conn, email, salt, hash, first_name, last_name);
+            System.out.println("Am ehre");
+            KeyPair pair = AuthHelper.generateRSAKeys();
+            System.out.println("Am ehre");
+            String privateKey = AuthHelper.keyToString(pair.getPrivate());
+            System.out.println("Am ehre");
+            String publicKey = AuthHelper.keyToString(pair.getPublic());
+            System.out.println("Am ehre now");
+
+            int id = Accounts.createAccount(conn, email, salt, hash, firstName, lastName, privateKey, publicKey);
             ResultSet rs = Accounts.getAccount(conn, id);
             APIUtils.sendResponse(httpExchange, 201, Accounts.serialize(rs, false));
         } catch (SQLException e) {

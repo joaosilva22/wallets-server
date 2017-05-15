@@ -2,10 +2,14 @@ package api;
 
 import auth.AuthHelper;
 import com.sun.net.httpserver.HttpExchange;
+import database.Accounts;
 import util.APIUtils;
 
 import java.io.IOException;
+import java.security.NoSuchAlgorithmException;
+import java.security.spec.InvalidKeySpecException;
 import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.Map;
 
 public class LoginHandler extends BaseHandler {
@@ -30,10 +34,20 @@ public class LoginHandler extends BaseHandler {
         }
 
         try {
-            // TODO(jp): ir buscar o salt e a hash a DB e validar; se for valido devolver 200, senao 401
-            //AuthHelper.validatePassword(password, )
-        } catch (Exception e) {
-            // TODO(jp): handle das excecoes certas
+            String hash = Accounts.getAccountPassword(conn, email);
+            String salt = Accounts.getAccountSalt(conn, email);
+            if (AuthHelper.validatePassword(password, salt, hash)) {
+                // TODO: gerar o access token e o refresh token e devolver no corpo da mensagem com o id
+                APIUtils.sendResponse(httpExchange, 200, format("success"));
+            } else {
+                APIUtils.sendResponse(httpExchange, 401, format("invalid credentials"));
+            }
+        } catch (SQLException e) {
+            APIUtils.sendResponse(httpExchange, 500, format(e.getMessage()));
+        } catch (NoSuchAlgorithmException e) {
+            APIUtils.sendResponse(httpExchange, 500, format(e.getMessage()));
+        } catch (InvalidKeySpecException e) {
+            APIUtils.sendResponse(httpExchange, 500, format(e.getMessage()));
         }
     }
 }

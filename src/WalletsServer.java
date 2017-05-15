@@ -32,6 +32,7 @@ public class WalletsServer {
         server.createContext("/wallets", new WalletsHandler(conn));
         server.createContext("/categories", new CategoriesHandler(conn));
         server.createContext("/movements", new MovementsHandler(conn));
+        server.createContext("/auth", new LoginHandler(conn));
         server.start();
 
         IOUtils.log("Server listening on port 8000...");

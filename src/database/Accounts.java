@@ -9,15 +9,17 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class Accounts {
-    public static int createAccount(Connection conn, String email, String salt, String password, String first_name, String last_name) throws SQLException {
-        String query = "INSERT INTO Account (email, salt, password, first_name, last_name) VALUES (?, ?, ?, ?, ?)";
+    public static int createAccount(Connection conn, String email, String salt, String password, String firstName, String lastName, String privateKey, String publicKey) throws SQLException {
+        String query = "INSERT INTO Account (email, salt, password, first_name, last_name, private_key, public_key) VALUES (?, ?, ?, ?, ?, ?, ?)";
 
         PreparedStatement stmt = conn.prepareStatement(query);
         stmt.setString(1, email);
         stmt.setString(2, salt);
         stmt.setString(3, password);
-        stmt.setString(4, first_name);
-        stmt.setString(5, last_name);
+        stmt.setString(4, firstName);
+        stmt.setString(5, lastName);
+        stmt.setString(6, privateKey);
+        stmt.setString(7, publicKey);
         stmt.executeUpdate();
 
         stmt.close();
@@ -36,6 +38,26 @@ public class Accounts {
     private static void updateAccount() {}
 
     private static void deleteAccount() {}
+
+    public static String getAccountPassword(Connection conn, String email) throws SQLException {
+        String query = "SELECT password FROM Account WHERE email = ?";
+
+        PreparedStatement stmt = conn.prepareStatement(query);
+        stmt.setString(1, email);
+
+        ResultSet rs = stmt.executeQuery();
+        return rs.getString("password");
+    }
+
+    public static String getAccountSalt(Connection conn, String email) throws SQLException {
+        String query = "SELECT salt FROM Account WHERE email = ?";
+
+        PreparedStatement stmt = conn.prepareStatement(query);
+        stmt.setString(1, email);
+
+        ResultSet rs = stmt.executeQuery();
+        return rs.getString("salt");
+    }
 
     public static String serialize(ResultSet data, boolean many) throws SQLException {
         if (many) {
