@@ -1,4 +1,4 @@
-package api;
+package views;
 
 import com.sun.net.httpserver.HttpExchange;
 import database.Categories;

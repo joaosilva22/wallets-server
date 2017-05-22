@@ -1,5 +1,5 @@
-import api.*;
-import auth.AuthHelper;
+import com.sun.org.apache.xml.internal.security.Init;
+import views.*;
 import com.sun.net.httpserver.HttpServer;
 import database.SQLiteConnection;
 import util.IOUtils;
@@ -13,6 +13,8 @@ public class WalletsServer {
     public static void main(String[] args) {
         HttpServer server;
         Connection conn;
+
+        Init.init();
 
         try {
             conn = SQLiteConnection.connect("database/wallets.db");
@@ -33,6 +35,7 @@ public class WalletsServer {
         server.createContext("/categories", new CategoriesHandler(conn));
         server.createContext("/movements", new MovementsHandler(conn));
         server.createContext("/auth", new LoginHandler(conn));
+        server.createContext("/refresh", new RefreshTokenView(conn));
         server.start();
 
         IOUtils.log("Server listening on port 8000...");

@@ -1,12 +1,16 @@
-package api;
+package views;
 
 import auth.AuthHelper;
+import auth.JsonWebToken;
 import com.sun.net.httpserver.HttpExchange;
+import crypto.RSAKeyGenKt;
 import database.Accounts;
 import util.APIUtils;
 
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
+import java.security.PrivateKey;
+import java.security.PublicKey;
 import java.security.spec.InvalidKeySpecException;
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -36,17 +40,24 @@ public class LoginHandler extends BaseHandler {
         try {
             String hash = Accounts.getAccountPassword(conn, email);
             String salt = Accounts.getAccountSalt(conn, email);
+            int id = Accounts.getAccountId(conn, email);
+
             if (AuthHelper.validatePassword(password, salt, hash)) {
-                // TODO: gerar o access token e o refresh token e devolver no corpo da mensagem com o id
-                APIUtils.sendResponse(httpExchange, 200, format("success"));
+                PrivateKey prv = Accounts.getAccountPrivateKey(conn, id);
+                PublicKey pub = Accounts.getAccountPublicKey(conn, id);
+
+                JsonWebToken access = new JsonWebToken(JsonWebToken.ACCESS_TOKEN, id, prv);
+                JsonWebToken refresh = new JsonWebToken(JsonWebToken.REFRESH_TOKEN, id, prv);
+
+                String tokens = "{\"access\":\"" + access.getToken() + "\",\"refresh\":\"" + refresh.getToken() + "\"}";
+                APIUtils.sendResponse(httpExchange, 200, tokens);
             } else {
                 APIUtils.sendResponse(httpExchange, 401, format("invalid credentials"));
             }
         } catch (SQLException e) {
+            // TODO: Possivelmente aqui é um 404
             APIUtils.sendResponse(httpExchange, 500, format(e.getMessage()));
-        } catch (NoSuchAlgorithmException e) {
-            APIUtils.sendResponse(httpExchange, 500, format(e.getMessage()));
-        } catch (InvalidKeySpecException e) {
+        } catch (Exception e) {
             APIUtils.sendResponse(httpExchange, 500, format(e.getMessage()));
         }
     }

@@ -2,7 +2,10 @@ package database;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import crypto.RSAKeyGenKt;
 
+import java.security.PrivateKey;
+import java.security.PublicKey;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -39,6 +42,16 @@ public class Accounts {
 
     private static void deleteAccount() {}
 
+    public static int getAccountId(Connection conn, String email) throws SQLException {
+        String query = "SELECT id FROM Account WHERE email = ?";
+
+        PreparedStatement stmt = conn.prepareStatement(query);
+        stmt.setString(1, email);
+
+        ResultSet rs = stmt.executeQuery();
+        return rs.getInt("id");
+    }
+
     public static String getAccountPassword(Connection conn, String email) throws SQLException {
         String query = "SELECT password FROM Account WHERE email = ?";
 
@@ -57,6 +70,30 @@ public class Accounts {
 
         ResultSet rs = stmt.executeQuery();
         return rs.getString("salt");
+    }
+
+    public static PrivateKey getAccountPrivateKey(Connection conn, int id) throws SQLException {
+        String query = "SELECT private_key FROM Account WHERE id = ?";
+
+        PreparedStatement stmt = conn.prepareStatement(query);
+        stmt.setInt(1, id);
+
+        ResultSet rs = stmt.executeQuery();
+        String privateKey = rs.getString("private_key");
+
+        return RSAKeyGenKt.toPrivateKey(privateKey);
+    }
+
+    public static PublicKey getAccountPublicKey(Connection conn, int id) throws SQLException {
+        String query = "SELECT public_key FROM Account WHERE id = ?";
+
+        PreparedStatement stmt = conn.prepareStatement(query);
+        stmt.setInt(1, id);
+
+        ResultSet rs = stmt.executeQuery();
+        String publicKey = rs.getString("public_key");
+
+        return RSAKeyGenKt.toPublicKey(publicKey);
     }
 
     public static String serialize(ResultSet data, boolean many) throws SQLException {
