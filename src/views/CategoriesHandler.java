@@ -1,13 +1,20 @@
 package views;
 
+import auth.InvalidJsonWebTokenException;
+import auth.JsonWebToken;
+import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpExchange;
+import database.Accounts;
 import database.Categories;
+import database.Wallets;
 import util.APIUtils;
 
 import java.io.IOException;
+import java.security.PublicKey;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Map;
 
 public class CategoriesHandler extends BaseHandler {
@@ -18,6 +25,12 @@ public class CategoriesHandler extends BaseHandler {
     @Override
     protected void post(HttpExchange httpExchange) throws IOException {
         Map<String, String> params = APIUtils.getPOSTparams(httpExchange);
+
+        String account = params.get("account");
+        if (account == null) {
+            APIUtils.sendResponse(httpExchange, 400, format("field 'acount' is required"));
+            return;
+        }
 
         String name = params.get("name");
         if (name == null) {
@@ -49,6 +62,13 @@ public class CategoriesHandler extends BaseHandler {
     @Override
     protected void get(HttpExchange httpExchange) throws IOException {
         Map<String, String> params = APIUtils.getGETparams(httpExchange);
+        Headers headers = httpExchange.getRequestHeaders();
+
+        String token = headers.getFirst("Authorization");
+        if (token == null) {
+            APIUtils.sendResponse(httpExchange, 401, format("missing authorization header"));
+            return;
+        }
 
         String id = params.get("id");
         if (id != null) {

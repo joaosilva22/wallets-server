@@ -74,6 +74,34 @@ public class Wallets {
         return stmt.executeQuery();
     }
 
+    public static ArrayList<Integer> getWalletMembers(Connection conn, int wallet) throws SQLException {
+        String query = "SELECT account FROM AccountWallet WHERE wallet = ?";
+
+        PreparedStatement stmt = conn.prepareStatement(query);
+        stmt.setInt(1, wallet);
+
+        ArrayList<Integer> result = new ArrayList<>();
+        ResultSet rs = stmt.executeQuery();
+        while (rs.next()) {
+            result.add(rs.getInt("account"));
+        }
+        return result;
+    }
+
+    public static int getWalletOwner(Connection conn, int wallet) throws SQLException {
+        String query = "SELECT owner FROM Wallet WHERE id = ?";
+
+        PreparedStatement stmt = conn.prepareStatement(query);
+        stmt.setInt(1, wallet);
+
+        ResultSet rs = stmt.executeQuery();
+        int owner = -1;
+        if (rs.next()) {
+            owner = rs.getInt("owner");
+        }
+        return owner;
+    }
+
     public static String serialize(ResultSet data, boolean many) throws SQLException {
         if (many) {
             Map<String, ArrayList<Map<String, String>>> list = new HashMap<>();

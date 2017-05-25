@@ -13,10 +13,11 @@ import java.security.PublicKey;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Map;
 
-public class WalletsHandler extends BaseHandler {
-    public WalletsHandler(Connection conn) {
+public class WalletsView extends BaseHandler {
+    public WalletsView(Connection conn) {
         super(conn);
     }
 
@@ -74,10 +75,32 @@ public class WalletsHandler extends BaseHandler {
     @Override
     protected void get(HttpExchange httpExchange) throws IOException {
         Map<String, String> params = APIUtils.getGETparams(httpExchange);
+        Headers headers = httpExchange.getRequestHeaders();
+
+        String token = headers.getFirst("Authorization");
+        if (token == null) {
+            APIUtils.sendResponse(httpExchange, 401, format("missing authorization header"));
+            return;
+        }
 
         String id = params.get("id");
         if (id != null) {
+            String uid = params.get("uid");
+            if (uid == null) {
+                APIUtils.sendResponse(httpExchange, 400, format("field 'uid' is required"));
+                return;
+            }
+
             try {
+                PublicKey key = Accounts.getAccountPublicKey(conn, Integer.parseInt(uid));
+                JsonWebToken jwt = new JsonWebToken(token, key);
+
+                ArrayList<Integer> members = Wallets.getWalletMembers(conn, Integer.parseInt(id));
+                if (!jwt.isAccessToken() || !members.contains(jwt.getUid())) {
+                    APIUtils.sendResponse(httpExchange, 403, format("forbidden"));
+                    return;
+                }
+
                 ResultSet rs = Wallets.getWallet(conn, Integer.parseInt(id));
                 if (!rs.isBeforeFirst()) {
                     APIUtils.sendResponse(httpExchange, 404, format("not found"));
@@ -86,7 +109,13 @@ public class WalletsHandler extends BaseHandler {
                     APIUtils.sendResponse(httpExchange, 200, Wallets.serialize(rs, false));
                     return;
                 }
+            } catch (InvalidJsonWebTokenException e) {
+                APIUtils.sendResponse(httpExchange, 401, format(e.getMessage()));
+                return;
             } catch (SQLException e) {
+                APIUtils.sendResponse(httpExchange, 500, format(e.getMessage()));
+                return;
+            } catch (Exception e) {
                 APIUtils.sendResponse(httpExchange, 500, format(e.getMessage()));
                 return;
             }
@@ -95,6 +124,14 @@ public class WalletsHandler extends BaseHandler {
         String account = params.get("account");
         if (account != null) {
             try {
+                PublicKey key = Accounts.getAccountPublicKey(conn, Integer.parseInt(account));
+                JsonWebToken jwt = new JsonWebToken(token, key);
+
+                if (!jwt.isAccessToken() || jwt.getUid() != Integer.parseInt(account)) {
+                    APIUtils.sendResponse(httpExchange, 403, format("forbidden"));
+                    return;
+                }
+
                 ResultSet rs = Wallets.getWalletsOfAccount(conn, Integer.parseInt(account));
                 if (!rs.isBeforeFirst()) {
                     APIUtils.sendResponse(httpExchange, 404, format("not found"));
@@ -103,18 +140,43 @@ public class WalletsHandler extends BaseHandler {
                     APIUtils.sendResponse(httpExchange, 200, Wallets.serialize(rs, true));
                     return;
                 }
+            } catch (InvalidJsonWebTokenException e) {
+                APIUtils.sendResponse(httpExchange, 401, format(e.getMessage()));
+                return;
             } catch (SQLException e) {
+                APIUtils.sendResponse(httpExchange, 404, format("not found"));
+                return;
+            } catch (Exception e) {
                 APIUtils.sendResponse(httpExchange, 500, format(e.getMessage()));
                 return;
             }
         }
 
-        APIUtils.sendResponse(httpExchange, 400, format("field 'id' or 'owner' is required"));
+        APIUtils.sendResponse(httpExchange, 400, format("field 'id' or 'account' is required"));
     }
 
     @Override
     protected void put(HttpExchange httpExchange) throws IOException {
         Map<String, String> params = APIUtils.getPUTparams(httpExchange);
+        Headers headers = httpExchange.getRequestHeaders();
+
+        String token = headers.getFirst("Authorization");
+        if (token == null) {
+            APIUtils.sendResponse(httpExchange, 401, format("missing authorization header"));
+            return;
+        }
+
+        String uid = params.get("uid");
+        if (uid == null) {
+            APIUtils.sendResponse(httpExchange, 400, format("field 'uid' is required"));
+            return;
+        }
+
+        String id = params.get("id");
+        if (id == null) {
+            APIUtils.sendResponse(httpExchange, 400, format("field 'id' is required"));
+            return;
+        }
 
         String name = params.get("name");
         if (name == null) {
@@ -122,9 +184,23 @@ public class WalletsHandler extends BaseHandler {
             return;
         }
 
-        String id = params.get("id");
-        if (id == null) {
-            APIUtils.sendResponse(httpExchange, 400, format("field 'id' is required"));
+        try {
+            PublicKey pub = Accounts.getAccountPublicKey(conn, Integer.parseInt(uid));
+            JsonWebToken jwt = new JsonWebToken(token, pub);
+
+            int owner = Wallets.getWalletOwner(conn, Integer.parseInt(id));
+            if (!jwt.isAccessToken() || jwt.getUid() != owner) {
+                APIUtils.sendResponse(httpExchange, 403, format("forbidden"));
+                return;
+            }
+        } catch (InvalidJsonWebTokenException e) {
+            APIUtils.sendResponse(httpExchange, 403, format(e.getMessage()));
+            return;
+        } catch(SQLException e) {
+            APIUtils.sendResponse(httpExchange, 404, format("not found"));
+            return;
+        } catch (Exception e) {
+            APIUtils.sendResponse(httpExchange, 500, format(e.getMessage()));
             return;
         }
 
@@ -140,10 +216,43 @@ public class WalletsHandler extends BaseHandler {
     @Override
     protected void delete(HttpExchange httpExchange) throws IOException {
         Map<String, String> params = APIUtils.getDELETEparams(httpExchange);
+        Headers headers = httpExchange.getRequestHeaders();
+
+        String token = headers.getFirst("Authorization");
+        if (token == null) {
+            APIUtils.sendResponse(httpExchange, 401, format("missing authorization header"));
+            return;
+        }
+
+        String uid = params.get("uid");
+        if (uid == null) {
+            APIUtils.sendResponse(httpExchange, 400, format("field 'uid' is required"));
+            return;
+        }
 
         String id = params.get("id");
         if (id == null) {
             APIUtils.sendResponse(httpExchange, 400, format("field 'id' is required"));
+            return;
+        }
+
+        try {
+            PublicKey pub = Accounts.getAccountPublicKey(conn, Integer.parseInt(uid));
+            JsonWebToken jwt = new JsonWebToken(token, pub);
+
+            int owner = Wallets.getWalletOwner(conn, Integer.parseInt(id));
+            if (!jwt.isAccessToken() || jwt.getUid() != owner) {
+                APIUtils.sendResponse(httpExchange, 403, format("forbidden"));
+                return;
+            }
+        } catch (InvalidJsonWebTokenException e) {
+            APIUtils.sendResponse(httpExchange, 403, format(e.getMessage()));
+            return;
+        } catch(SQLException e) {
+            APIUtils.sendResponse(httpExchange, 404, format("not found"));
+            return;
+        } catch (Exception e) {
+            APIUtils.sendResponse(httpExchange, 500, format(e.getMessage()));
             return;
         }
 

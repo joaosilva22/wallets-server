@@ -22,7 +22,9 @@ DROP TABLE IF EXISTS AccountWallet;
 CREATE TABLE AccountWallet (
   account INTEGER,
   wallet INTEGER,
-  PRIMARY KEY (account, wallet)
+  PRIMARY KEY(account, wallet),
+  FOREIGN KEY(account) REFERENCES Account(id) ON DELETE CASCADE,
+  FOREIGN KEY(wallet) REFERENCES Wallet(id) ON DELETE CASCADE
 );
 
 DROP TABLE IF EXISTS Category;
