@@ -19,8 +19,18 @@ public class Wallets {
         stmt.setInt(2, owner);
         stmt.executeUpdate();
 
+        int wallet = stmt.getGeneratedKeys().getInt(1);
         stmt.close();
-        return stmt.getGeneratedKeys().getInt(1);
+
+        query = "INSERT INTO AccountWallet(account, wallet) VALUES (?, ?)";
+
+        stmt = conn.prepareStatement(query);
+        stmt.setInt(1, owner);
+        stmt.setInt(2, wallet);
+        stmt.executeUpdate();
+
+        stmt.close();
+        return wallet;
     }
 
     public static ResultSet getWallet(Connection conn, int id) throws SQLException {
@@ -56,6 +66,7 @@ public class Wallets {
 
     public static ResultSet getWalletsOfAccount(Connection conn, int account) throws SQLException {
         // String query = "SELECT Wallet.* FROM Account INNER JOIN Wallet ON Account.id = Wallet.owner WHERE id = ?"
+        return null;
     }
 
     public static String serialize(ResultSet data) throws SQLException {

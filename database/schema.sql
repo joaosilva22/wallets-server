@@ -10,15 +10,19 @@ CREATE TABLE Account (
   public_key TEXT
 );
 
-DROP TABLE IF EXISTS AccountWallet;
-CREATE TABLE AccountWallet
-
 DROP TABLE IF EXISTS Wallet;
 CREATE TABLE Wallet (
   id INTEGER PRIMARY KEY,
   name TEXT,
   owner INTEGER,
   FOREIGN KEY(owner) REFERENCES Account(id) ON DELETE CASCADE
+);
+
+DROP TABLE IF EXISTS AccountWallet;
+CREATE TABLE AccountWallet (
+  account INTEGER,
+  wallet INTEGER,
+  PRIMARY KEY (account, wallet)
 );
 
 DROP TABLE IF EXISTS Category;
