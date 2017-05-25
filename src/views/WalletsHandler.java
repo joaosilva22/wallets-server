@@ -33,7 +33,7 @@ public class WalletsHandler extends BaseHandler {
         try {
             int id = Wallets.createWallet(conn, name, Integer.parseInt(owner));
             ResultSet rs = Wallets.getWallet(conn, id);
-            APIUtils.sendResponse(httpExchange, 201, Wallets.serialize(rs));
+            APIUtils.sendResponse(httpExchange, 201, Wallets.serialize(rs, false));
         } catch (SQLException e) {
             APIUtils.sendResponse(httpExchange, 500, format(e.getMessage()));
         }
@@ -51,7 +51,7 @@ public class WalletsHandler extends BaseHandler {
                     APIUtils.sendResponse(httpExchange, 404, format("not found"));
                     return;
                 } else {
-                    APIUtils.sendResponse(httpExchange, 200, Wallets.serialize(rs));
+                    APIUtils.sendResponse(httpExchange, 200, Wallets.serialize(rs, false));
                     return;
                 }
             } catch (SQLException e) {
@@ -60,13 +60,24 @@ public class WalletsHandler extends BaseHandler {
             }
         }
 
-        String owner = params.get("owner");
-        if (owner == null) {
-            APIUtils.sendResponse(httpExchange, 400, format("field 'id' or 'owner' is required"));
-            return;
+        String account = params.get("account");
+        if (account != null) {
+            try {
+                ResultSet rs = Wallets.getWalletsOfAccount(conn, Integer.parseInt(account));
+                if (!rs.isBeforeFirst()) {
+                    APIUtils.sendResponse(httpExchange, 404, format("not found"));
+                    return;
+                } else {
+                    APIUtils.sendResponse(httpExchange, 200, Wallets.serialize(rs, true));
+                    return;
+                }
+            } catch (SQLException e) {
+                APIUtils.sendResponse(httpExchange, 500, format(e.getMessage()));
+                return;
+            }
         }
 
-        // TODO: Devolver
+        APIUtils.sendResponse(httpExchange, 400, format("field 'id' or 'owner' is required"));
     }
 
     @Override
@@ -88,7 +99,7 @@ public class WalletsHandler extends BaseHandler {
         try {
             Wallets.updateWallet(conn, name, Integer.parseInt(id));
             ResultSet rs = Wallets.getWallet(conn, Integer.parseInt(id));
-            APIUtils.sendResponse(httpExchange, 200, Wallets.serialize(rs));
+            APIUtils.sendResponse(httpExchange, 200, Wallets.serialize(rs, false));
         } catch (SQLException e) {
             APIUtils.sendResponse(httpExchange, 500, format(e.getMessage()));
         }

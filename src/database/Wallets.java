@@ -7,6 +7,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -65,12 +66,33 @@ public class Wallets {
     }
 
     public static ResultSet getWalletsOfAccount(Connection conn, int account) throws SQLException {
-        // String query = "SELECT Wallet.* FROM Account INNER JOIN Wallet ON Account.id = Wallet.owner WHERE id = ?"
-        return null;
+        String query = "SELECT Wallet.* FROM Wallet INNER JOIN AccountWallet ON AccountWallet.account = ? GROUP BY Wallet.id";
+
+        PreparedStatement stmt = conn.prepareStatement(query);
+        stmt.setInt(1, account);
+
+        return stmt.executeQuery();
     }
 
-    public static String serialize(ResultSet data) throws SQLException {
+    public static String serialize(ResultSet data, boolean many) throws SQLException {
+        if (many) {
+            Map<String, ArrayList<Map<String, String>>> list = new HashMap<>();
+            list.put("wallets", new ArrayList<>());
+
+            while (data.next()) {
+                Map<String, String> fields = new HashMap<>();
+                fields.put("id", data.getObject("id").toString());
+                fields.put("name", data.getObject("name").toString());
+                fields.put("owner", data.getObject("owner").toString());
+                list.get("wallets").add(fields);
+            }
+
+            Gson gson = new GsonBuilder().create();
+            return gson.toJson(list);
+        }
+
         Map<String, String> fields = new HashMap<>();
+        fields.put("id", data.getObject("id").toString());
         fields.put("name", data.getObject("name").toString());
         fields.put("owner", data.getObject("owner").toString());
 
