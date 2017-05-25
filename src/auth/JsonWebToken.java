@@ -19,15 +19,15 @@ public class JsonWebToken {
 
     private int uid;
     private Timestamp iat, exp;
-    private String token;
+    private String token, aud;
 
     public JsonWebToken(String type, int uid, PrivateKey key) throws Exception {
         switch (type) {
             case ACCESS_TOKEN:
-                generateToken(key, uid, 15);
+                generateToken(key, uid, 15, "access");
                 break;
             case REFRESH_TOKEN:
-                generateToken(key, uid, 10500);
+                generateToken(key, uid, 10500, "refresh");
                 break;
             default:
                 throw new InvalidJsonWebTokenException("invalid token type");
@@ -55,6 +55,7 @@ public class JsonWebToken {
         iat = new Timestamp(jsonPayload.get("iat").getAsLong());
         exp = new Timestamp(jsonPayload.get("exp").getAsLong());
         uid = jsonPayload.get("sub").getAsInt();
+        aud = jsonPayload.get("aud").getAsString();
 
         if (hasExpired()) {
             throw new InvalidJsonWebTokenException("expired token");
@@ -88,13 +89,14 @@ public class JsonWebToken {
         return sig.verify(signature);
     }
 
-    private void generateToken(PrivateKey key, int uid, int minutes) throws Exception {
+    private void generateToken(PrivateKey key, int uid, int minutes, String aud) throws Exception {
         iat = generateIat();
         exp = generateExp(iat, Calendar.MINUTE, minutes);
         this.uid = uid;
+        this.aud = aud;
 
         String header =  "{\"alg\": \"RSA\", \"typ\":\"JWT\" }";
-        String payload = "{\"sub\":" + uid + ",\"iat\":" + iat.getTime() + ",\"exp\":" + exp.getTime() + "}";
+        String payload = "{\"sub\":" + uid + ",\"iat\":" + iat.getTime() + ",\"exp\":" + exp.getTime() + ",\"aud\":\"" + aud + "\"}";
 
         byte[] unsignedToken = getUnsignedToken(header.getBytes(), payload.getBytes());
         byte[] signature = sign(key, unsignedToken);
@@ -137,5 +139,13 @@ public class JsonWebToken {
 
     public int getUid() {
         return uid;
+    }
+
+    public boolean isAccessToken() {
+        return aud.equals("access");
+    }
+
+    public boolean isRefreshToken() {
+        return aud.equals("refresh");
     }
 }

@@ -1,10 +1,15 @@
 package views;
 
+import auth.InvalidJsonWebTokenException;
+import auth.JsonWebToken;
+import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpExchange;
+import database.Accounts;
 import database.Wallets;
 import util.APIUtils;
 
 import java.io.IOException;
+import java.security.PublicKey;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -18,15 +23,42 @@ public class WalletsHandler extends BaseHandler {
     @Override
     protected void post(HttpExchange httpExchange) throws IOException {
         Map<String, String> params = APIUtils.getPOSTparams(httpExchange);
+        Headers headers = httpExchange.getRequestHeaders();
+
+        String token = headers.getFirst("Authorization");
+        if (token == null) {
+            APIUtils.sendResponse(httpExchange, 401, format("missing authorization header"));
+            return;
+        }
 
         String name = params.get("name");
         if (name == null) {
             APIUtils.sendResponse(httpExchange, 400, format("field 'name' is required"));
+            return;
         }
 
         String owner = params.get("owner");
         if (owner == null) {
             APIUtils.sendResponse(httpExchange, 400, format("field 'owner' is required"));
+            return;
+        }
+
+        try {
+            PublicKey pub = Accounts.getAccountPublicKey(conn, Integer.parseInt(owner));
+            JsonWebToken jwt = new JsonWebToken(token, pub);
+
+            if (!jwt.isAccessToken() || jwt.getUid() != Integer.parseInt(owner)) {
+                APIUtils.sendResponse(httpExchange, 403, format("forbidden"));
+                return;
+            }
+        } catch (InvalidJsonWebTokenException e) {
+            APIUtils.sendResponse(httpExchange, 403, format(e.getMessage()));
+            return;
+        } catch(SQLException e) {
+            APIUtils.sendResponse(httpExchange, 404, format("not found"));
+            return;
+        } catch (Exception e) {
+            APIUtils.sendResponse(httpExchange, 500, format(e.getMessage()));
             return;
         }
 
