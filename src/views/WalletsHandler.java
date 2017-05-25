@@ -44,21 +44,29 @@ public class WalletsHandler extends BaseHandler {
         Map<String, String> params = APIUtils.getGETparams(httpExchange);
 
         String id = params.get("id");
-        if (id == null) {
-            APIUtils.sendResponse(httpExchange, 400, format("field 'id' is required"));
+        if (id != null) {
+            try {
+                ResultSet rs = Wallets.getWallet(conn, Integer.parseInt(id));
+                if (!rs.isBeforeFirst()) {
+                    APIUtils.sendResponse(httpExchange, 404, format("not found"));
+                    return;
+                } else {
+                    APIUtils.sendResponse(httpExchange, 200, Wallets.serialize(rs));
+                    return;
+                }
+            } catch (SQLException e) {
+                APIUtils.sendResponse(httpExchange, 500, format(e.getMessage()));
+                return;
+            }
+        }
+
+        String owner = params.get("owner");
+        if (owner == null) {
+            APIUtils.sendResponse(httpExchange, 400, format("field 'id' or 'owner' is required"));
             return;
         }
 
-        try {
-            ResultSet rs = Wallets.getWallet(conn, Integer.parseInt(id));
-            if (!rs.isBeforeFirst() ) {
-                APIUtils.sendResponse(httpExchange, 404, format("not found"));
-            } else {
-                APIUtils.sendResponse(httpExchange, 200, Wallets.serialize(rs));
-            }
-        } catch (SQLException e) {
-            APIUtils.sendResponse(httpExchange, 500, format(e.getMessage()));
-        }
+        // TODO: Devolver
     }
 
     @Override

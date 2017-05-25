@@ -54,6 +54,10 @@ public class Wallets {
         return n;
     }
 
+    public static ResultSet getWalletsOfAccount(Connection conn, int account) throws SQLException {
+        // String query = "SELECT Wallet.* FROM Account INNER JOIN Wallet ON Account.id = Wallet.owner WHERE id = ?"
+    }
+
     public static String serialize(ResultSet data) throws SQLException {
         Map<String, String> fields = new HashMap<>();
         fields.put("name", data.getObject("name").toString());

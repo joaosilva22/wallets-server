@@ -10,6 +10,9 @@ CREATE TABLE Account (
   public_key TEXT
 );
 
+DROP TABLE IF EXISTS AccountWallet;
+CREATE TABLE AccountWallet
+
 DROP TABLE IF EXISTS Wallet;
 CREATE TABLE Wallet (
   id INTEGER PRIMARY KEY,
