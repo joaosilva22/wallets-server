@@ -11,10 +11,9 @@ import java.io.IOException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.sql.Connection;
-import java.sql.SQLException;
 import java.util.Map;
 
-public class RefreshTokenView extends BaseHandler {
+public class RefreshTokenView extends BaseView {
     public RefreshTokenView(Connection conn) {
         super(conn);
     }

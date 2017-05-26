@@ -3,21 +3,18 @@ package views;
 import auth.AuthHelper;
 import auth.JsonWebToken;
 import com.sun.net.httpserver.HttpExchange;
-import crypto.RSAKeyGenKt;
 import database.Accounts;
 import util.APIUtils;
 
 import java.io.IOException;
-import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
-import java.security.spec.InvalidKeySpecException;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Map;
 
-public class LoginHandler extends BaseHandler {
-    public LoginHandler(Connection conn) {
+public class LoginView extends BaseView {
+    public LoginView(Connection conn) {
         super(conn);
     }
 

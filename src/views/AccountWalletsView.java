@@ -16,7 +16,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Map;
 
-public class AccountWalletsView extends BaseHandler {
+public class AccountWalletsView extends BaseView {
     public AccountWalletsView(Connection conn) {
         super(conn);
     }

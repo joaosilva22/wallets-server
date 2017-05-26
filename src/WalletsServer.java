@@ -34,7 +34,7 @@ public class WalletsServer {
         server.createContext("/wallets", new WalletsView(conn));
         server.createContext("/categories", new CategoriesView(conn));
         server.createContext("/movements", new MovementsView(conn));
-        server.createContext("/auth", new LoginHandler(conn));
+        server.createContext("/auth", new LoginView(conn));
         server.createContext("/refresh", new RefreshTokenView(conn));
         server.createContext("/account-wallets", new AccountWalletsView(conn));
         server.start();

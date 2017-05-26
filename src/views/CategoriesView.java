@@ -17,7 +17,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Map;
 
-public class CategoriesView extends BaseHandler {
+public class CategoriesView extends BaseView {
     public CategoriesView(Connection conn) {
         super(conn);
     }

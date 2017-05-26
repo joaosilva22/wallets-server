@@ -8,10 +8,10 @@ import util.IOUtils;
 import java.io.IOException;
 import java.sql.Connection;
 
-public class BaseHandler implements HttpHandler {
+public class BaseView implements HttpHandler {
     Connection conn;
 
-    BaseHandler(Connection conn) {
+    BaseView(Connection conn) {
         this.conn = conn;
     }
 

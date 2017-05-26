@@ -16,7 +16,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Map;
 
-public class WalletsView extends BaseHandler {
+public class WalletsView extends BaseView {
     public WalletsView(Connection conn) {
         super(conn);
     }

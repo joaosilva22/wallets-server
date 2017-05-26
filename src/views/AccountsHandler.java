@@ -15,7 +15,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Map;
 
-public class AccountsHandler extends BaseHandler {
+public class AccountsHandler extends BaseView {
     public AccountsHandler(Connection conn) {
         super(conn);
     }

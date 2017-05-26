@@ -18,7 +18,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Map;
 
-public class MovementsView extends BaseHandler {
+public class MovementsView extends BaseView {
     public MovementsView(Connection conn) {
         super(conn);
     }
