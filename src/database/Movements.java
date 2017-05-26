@@ -99,6 +99,20 @@ public class Movements {
         return stmt.executeQuery();
     }
 
+    public static int getMovementWallet(Connection conn, int movement) throws SQLException {
+        String query = "SELECT wallet FROM Category INNER JOIN Movement ON Movement.category = Category.id WHERE Movement.id = ?";
+
+        PreparedStatement stmt = conn.prepareStatement(query);
+        stmt.setInt(1, movement);
+
+        int wallet = -1;
+        ResultSet rs = stmt.executeQuery();
+        if (rs.next()) {
+            wallet = rs.getInt("wallet");
+        }
+        return wallet;
+    }
+
     public static String serialize(ResultSet data, boolean many) throws SQLException {
         if (many) {
             Map<String, ArrayList<Map<String, String>>> list = new HashMap<>();
