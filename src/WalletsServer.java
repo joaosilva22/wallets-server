@@ -17,7 +17,7 @@ import java.sql.SQLException;
 
 public class WalletsServer {
     public static void main(String[] args) {
-        HttpServer server;
+        HttpsServer server;
         Connection conn;
 
         Init.init();
@@ -26,24 +26,26 @@ public class WalletsServer {
             conn = SQLiteConnection.connect("database/wallets.db");
             conn.createStatement().execute("PRAGMA foreign_keys = ON");
 
-            server = HttpServer.create(new InetSocketAddress(8000), 0)
+            //server = HttpServer.create(new InetSocketAddress(8000), 0)
 
-            /*** NEW FROM HERE ***/ /*
+            /*** NEW FROM HERE ***/
             InetSocketAddress address = new InetSocketAddress(8000);
 
             server = HttpsServer.create(address, 0);
             SSLContext sslContext = SSLContext.getInstance("TLS");
 
-            char[] password = "password".toCharArray();
+            char[] password = "123456".toCharArray();
             KeyStore ks = KeyStore.getInstance("JKS");
-            FileInputStream fis = new FileInputStream("testkey.jks");
-            ks.load(fis, password);
+            ks.load(new FileInputStream("server.keys"), password);
+
+            KeyStore ts = KeyStore.getInstance("JKS");
+            ts.load(new FileInputStream("truststore"), password);
 
             KeyManagerFactory kmf = KeyManagerFactory.getInstance("SunX509");
             kmf.init(ks, password);
 
             TrustManagerFactory tmf = TrustManagerFactory.getInstance("SunX509");
-            tmf.init(ks);
+            tmf.init(ts);
 
             sslContext.init(kmf.getKeyManagers(), tmf.getTrustManagers(), null);
             server.setHttpsConfigurator(new HttpsConfigurator(sslContext) {
@@ -63,7 +65,7 @@ public class WalletsServer {
                     }
                 }
             });
-            */ /*** UNTIL HERE ***/
+            /*** UNTIL HERE ***/
 
         } catch (IOException e) {
             IOUtils.err(e.getMessage());

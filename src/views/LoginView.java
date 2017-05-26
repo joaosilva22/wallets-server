@@ -46,13 +46,12 @@ public class LoginView extends BaseView {
                 JsonWebToken access = new JsonWebToken(JsonWebToken.ACCESS_TOKEN, id, prv);
                 JsonWebToken refresh = new JsonWebToken(JsonWebToken.REFRESH_TOKEN, id, prv);
 
-                String tokens = "{\"access\":\"" + access.getToken() + "\",\"refresh\":\"" + refresh.getToken() + "\"}";
+                String tokens = "{\"id\":" + id + ",\"access\":\"" + access.getToken() + "\",\"refresh\":\"" + refresh.getToken() + "\"}";
                 APIUtils.sendResponse(httpExchange, 200, tokens);
             } else {
                 APIUtils.sendResponse(httpExchange, 401, format("invalid credentials"));
             }
         } catch (SQLException e) {
-            // TODO: Possivelmente aqui é um 404
             APIUtils.sendResponse(httpExchange, 500, format(e.getMessage()));
         } catch (Exception e) {
             APIUtils.sendResponse(httpExchange, 500, format(e.getMessage()));
