@@ -76,6 +76,20 @@ public class Categories {
         return stmt.executeQuery();
     }
 
+    public static int getCategoryWallet(Connection conn, int category) throws SQLException {
+        String query = "SELECT wallet FROM Category WHERE id = ?";
+
+        PreparedStatement stmt = conn.prepareStatement(query);
+        stmt.setInt(1, category);
+
+        int wallet = -1;
+        ResultSet rs = stmt.executeQuery();
+        if (rs.next()) {
+            wallet = rs.getInt("wallet");
+        }
+        return wallet;
+    }
+
     public static String serialize(ResultSet data, boolean many) throws SQLException {
         if (many) {
             Map<String, ArrayList<Map<String, String>>> list = new HashMap<>();
