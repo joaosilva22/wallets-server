@@ -73,7 +73,7 @@ public class AccountWalletsView extends BaseView {
         try {
             int accountId = AccountWallets.getAccountId(conn, account);
             AccountWallets.createAccountWallet(conn, accountId, Integer.parseInt(wallet));
-            ResultSet rs = AccountWallets.getAccountWallet(conn, Integer.parseInt(account), Integer.parseInt(wallet));
+            ResultSet rs = AccountWallets.getAccountWallet(conn, accountId, Integer.parseInt(wallet));
             APIUtils.sendResponse(httpExchange, 200, AccountWallets.serialize(rs));
         } catch (SQLException e) {
             APIUtils.sendResponse(httpExchange, 500, format(e.getMessage()));

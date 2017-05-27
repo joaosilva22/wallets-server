@@ -66,7 +66,7 @@ public class Wallets {
     }
 
     public static ResultSet getWalletsOfAccount(Connection conn, int account) throws SQLException {
-        String query = "SELECT Wallet.* FROM Wallet INNER JOIN AccountWallet ON AccountWallet.account = ? GROUP BY Wallet.id";
+        String query = "SELECT Wallet.* FROM Wallet INNER JOIN AccountWallet ON Wallet.id = AccountWallet.wallet WHERE AccountWallet.account = ? GROUP BY Wallet.id";
 
         PreparedStatement stmt = conn.prepareStatement(query);
         stmt.setInt(1, account);

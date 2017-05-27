@@ -60,9 +60,9 @@ public class AccountWallets {
     }
 
     public static String serialize(ResultSet data) throws SQLException {
-        Map<String, Integer> fields = new HashMap<>();
-        fields.put("account", data.getInt("account"));
-        fields.put("wallet", data.getInt("wallet"));
+        Map<String, String> fields = new HashMap<>();
+        fields.put("account", data.getObject("account").toString());
+        fields.put("wallet", data.getObject("wallet").toString());
 
         Gson gson = new GsonBuilder().create();
         return gson.toJson(fields);
