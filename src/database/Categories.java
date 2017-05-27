@@ -97,6 +97,7 @@ public class Categories {
 
             while (data.next()) {
                 Map<String, String> fields = new HashMap<>();
+                fields.put("id", data.getObject("id").toString());
                 fields.put("name", data.getObject("name").toString());
                 fields.put("amount", data.getObject("amount").toString());
                 fields.put("wallet", data.getObject("wallet").toString());
@@ -108,6 +109,7 @@ public class Categories {
         }
 
         Map<String, String> fields = new HashMap<>();
+        fields.put("id", data.getObject("id").toString());
         fields.put("name", data.getObject("name").toString());
         fields.put("amount", data.getObject("amount").toString());
         fields.put("wallet", data.getObject("wallet").toString());

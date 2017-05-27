@@ -45,6 +45,20 @@ public class AccountWallets {
         return n;
     }
 
+    public static int getAccountId(Connection conn, String email) throws SQLException {
+        String query = "SELECT id FROM Account WHERE email = ?";
+
+        PreparedStatement stmt = conn.prepareStatement(query);
+        stmt.setString(1, email);
+
+        ResultSet rs = stmt.executeQuery();
+        int id = -1;
+        if (rs.next()) {
+            id = rs.getInt("id");
+        }
+        return id;
+    }
+
     public static String serialize(ResultSet data) throws SQLException {
         Map<String, Integer> fields = new HashMap<>();
         fields.put("account", data.getInt("account"));

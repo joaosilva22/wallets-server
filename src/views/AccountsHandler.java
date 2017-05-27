@@ -1,18 +1,24 @@
 package views;
 
 import auth.AuthHelper;
+import auth.InvalidJsonWebTokenException;
+import auth.JsonWebToken;
+import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpExchange;
 import crypto.RSAKeyGenKt;
 import database.Accounts;
+import database.Wallets;
 import util.APIUtils;
 
 import java.io.IOException;
 import java.security.KeyPair;
 import java.security.NoSuchAlgorithmException;
+import java.security.PublicKey;
 import java.security.spec.InvalidKeySpecException;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Map;
 
 public class AccountsHandler extends BaseView {
@@ -66,5 +72,66 @@ public class AccountsHandler extends BaseView {
         } catch (InvalidKeySpecException e) {
             APIUtils.sendResponse(httpExchange, 500, format(e.getMessage()));
         }
+    }
+
+    @Override
+    protected void get(HttpExchange httpExchange) throws IOException {
+        Map<String, String> params = APIUtils.getGETparams(httpExchange);
+        Headers headers = httpExchange.getRequestHeaders();
+
+        String token = headers.getFirst("Authorization");
+        if (token == null) {
+            APIUtils.sendResponse(httpExchange, 401, format("missing authorization header"));
+            return;
+        }
+
+        String uid = params.get("uid");
+        if (uid == null) {
+            APIUtils.sendResponse(httpExchange, 400, format("field 'uid' is required"));
+            return;
+        }
+
+        try {
+            PublicKey pub = Accounts.getAccountPublicKey(conn, Integer.parseInt(uid));
+            JsonWebToken jwt = new JsonWebToken(token, pub);
+
+            if (!jwt.isAccessToken()) {
+                APIUtils.sendResponse(httpExchange, 403, format("forbidden"));
+                return;
+            }
+        } catch (InvalidJsonWebTokenException e) {
+            APIUtils.sendResponse(httpExchange, 403, format(e.getMessage()));
+            return;
+        } catch(SQLException e) {
+            APIUtils.sendResponse(httpExchange, 404, format("not found"));
+            return;
+        } catch (Exception e) {
+            APIUtils.sendResponse(httpExchange, 500, format(e.getMessage()));
+            return;
+        }
+
+        String id = params.get("id");
+        if (id != null) {
+            try {
+                ResultSet rs = Accounts.getAccount(conn, Integer.parseInt(id));
+                APIUtils.sendResponse(httpExchange, 200, Accounts.serialize(rs, false));
+            } catch (SQLException e) {
+                APIUtils.sendResponse(httpExchange, 404, format("not found"));
+                return;
+            }
+        }
+
+        String wallet = params.get("wallet");
+        if (wallet != null) {
+            try {
+                ResultSet rs = Accounts.getAccountsFromWallet(conn, Integer.parseInt(wallet));
+                APIUtils.sendResponse(httpExchange, 200, Accounts.serialize(rs, true));
+            } catch (SQLException e) {
+                APIUtils.sendResponse(httpExchange, 404, format("not found"));
+                return;
+            }
+        }
+
+        APIUtils.sendResponse(httpExchange, 400, format("field 'id' or 'wallet' is required"));
     }
 }

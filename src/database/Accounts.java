@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import crypto.RSAKeyGenKt;
 
+import javax.xml.transform.Result;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.sql.*;
@@ -94,6 +95,15 @@ public class Accounts {
         String publicKey = rs.getString("public_key");
 
         return RSAKeyGenKt.toPublicKey(publicKey);
+    }
+
+    public static ResultSet getAccountsFromWallet(Connection conn, int wallet) throws SQLException {
+        String query = "SELECT account.* FROM account INNER JOIN accountwallet ON account.id = accountwallet.account WHERE wallet=?";
+
+        PreparedStatement stmt = conn.prepareStatement(query);
+        stmt.setInt(1, wallet);
+
+        return stmt.executeQuery();
     }
 
     public static String serialize(ResultSet data, boolean many) throws SQLException {
