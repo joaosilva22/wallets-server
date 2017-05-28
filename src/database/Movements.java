@@ -120,6 +120,7 @@ public class Movements {
 
             while (data.next()) {
                 Map<String, String> fields = new HashMap<>();
+                fields.put("id", data.getObject("id").toString());
                 fields.put("name", data.getObject("name").toString());
                 fields.put("description", data.getObject("description").toString());
                 fields.put("amount", data.getObject("amount").toString());
@@ -132,6 +133,7 @@ public class Movements {
         }
 
         Map<String, String> fields = new HashMap<>();
+        fields.put("id", data.getObject("id").toString());
         fields.put("name", data.getObject("name").toString());
         fields.put("description", data.getObject("description").toString());
         fields.put("amount", data.getObject("amount").toString());
