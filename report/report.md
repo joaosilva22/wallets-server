@@ -1,4 +1,11 @@
-## 1.Introduction ##
+# Collaborative Budgeting Application #
+#### 27 Maio 2017 ####
+
++ Diogo Amorim Cepa, up201403367
++ Gonçalo Barroso Gonçalves de Sousa Ribeiro, up201403877
++ João Pedro Gomes Silva, up201405490
+
+## 1. Introduction ##
 
 The application is a collaborative budgeting application that enables people to track income and expenses across a family, an organization, or any other group of individuals that share monetary resources, as well as get an overview of spending trends and tendencies. The application is multi-platform and we provide both Android and native Desktop clients.
 
@@ -91,7 +98,7 @@ Authorization is granted by the verification of the user's JWT access token to m
 
 The native desktop client application was developed using Java with Swing to create the GUI. The Android application was created using Android Java.
 
-### 4. Conclusion ###
+## 4. Conclusion 
 
 The application is the result of a successful attempt to implement a REST service. It uses stateless authentication and authorization methods, grants the validity of the tokens using RSA assymetric key encryption and token expiration and prevents the stealing of credentials on the wire by implementing HTTPS with self-signed certificates. However, it would still benefit from some improvements:
 + A way to revoke tokens. The only way tokens can be invalidated at this time is through expiration. This was not implemented as it is not trivial to revoke the tokens while at the same time mantaining a completely stateless service. 
