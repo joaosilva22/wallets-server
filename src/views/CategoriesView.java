@@ -198,13 +198,7 @@ public class CategoriesView extends BaseView {
             PublicKey pub = Accounts.getAccountPublicKey(conn, Integer.parseInt(uid));
             JsonWebToken jwt = new JsonWebToken(token, pub);
 
-            int wallet = Categories.getCategoryWallet(conn, Integer.parseInt(id));
-            if (wallet == -1) {
-                APIUtils.sendResponse(httpExchange, 404, format("not found"));
-                return;
-            }
-            int owner = Wallets.getWalletOwner(conn, wallet);
-            if (!jwt.isAccessToken() || jwt.getUid() != owner) {
+            if (!jwt.isAccessToken()) {
                 APIUtils.sendResponse(httpExchange, 403, format("forbidden"));
                 return;
             }
