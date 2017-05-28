@@ -32,8 +32,9 @@ The server application is distributed across a few packages, each with it's dist
 
 **Table 1**: Overview of the application's modules
 
-IMAGE 2: Package diagram of the application
-[ Package diagram ]
+![alt text](https://github.com/joaosilva22/wallets-server/blob/master/report/package_diagram.png?raw=true "Package diagram")
+
+Image 2: Package diagram of the application
 
 ### 2.2. Resources ###
 
