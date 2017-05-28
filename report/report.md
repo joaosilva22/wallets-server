@@ -34,7 +34,7 @@ The server application is distributed across a few packages, each with it's dist
 
 ![alt text](https://github.com/joaosilva22/wallets-server/blob/master/report/package_diagram.png?raw=true "Package diagram")
 
-Image 2: Package diagram of the application
+**Image 2**: Package diagram of the application
 
 ### 2.2. Resources ###
 
